@@ -44,19 +44,19 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/user",
-    name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: Person,
-    component: UserProfile,
-    layout: "/admin"
-  },
-  {
     path: "/table",
     name: "Acionamentos",
     rtlName: "قائمة الجدول",
     icon: "settings_remote",
     component: TableList,
+    layout: "/admin"
+  },
+  {
+    path: "/user",
+    name: "Configurações",
+    rtlName: "ملف تعريفي للمستخدم",
+    icon: 'settings',
+    component: UserProfile,
     layout: "/admin"
   }
   // {

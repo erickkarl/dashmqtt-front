@@ -17,7 +17,7 @@ var delays2 = 80,
 
 const dailySalesChart = {
   data: {
-    labels: ["M", "T", "W", "T", "F", "S", "S"],
+    labels: ["M", "S"],
     series: [[40, 17, 12, 17, 23, 18, 38]]
   },
   options: {
