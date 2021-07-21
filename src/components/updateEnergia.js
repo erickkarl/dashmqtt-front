@@ -7,7 +7,6 @@ export default function UpdateEnergia() {
   async function updateDb() {
     const response = await axios.get('http://localhost:5000/auth/sendEnergy');
     setEnergia(response.data.user.value);
-    console.log('jota');
   }
 
   useEffect(() => {
@@ -18,7 +17,7 @@ export default function UpdateEnergia() {
   }, [energia]);
     return (
         <div>
-            {energia} C
+            {energia} W
         </div>
     )
 }

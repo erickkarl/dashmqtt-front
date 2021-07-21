@@ -18,7 +18,7 @@ export default function UpdateAgua() {
   }, [agua]);
     return (
         <div>
-            {agua} L
+            {agua} L/min
         </div>
     )
 }

@@ -5,7 +5,7 @@ import { ContactlessOutlined } from "@material-ui/icons";
 export default function UpdateTemperatura() {
   const [temperatura, setTemperatura] = useState(10);
   async function updateDb() {
-    const response = await axios.get('http://localhost:5000/auth/sendEnergy');
+    const response = await axios.get('http://localhost:5000/auth/sendTemperature');
     setTemperatura(response.data.user.value);
     console.log('jota');
   }

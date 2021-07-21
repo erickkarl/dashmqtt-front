@@ -1,5 +1,4 @@
 //mudar o botao do grafico para mostrar qual esta selecionado
-
 import React, { useState } from "react";
 import axios from "axios";
 // react plugin for creating charts
@@ -41,6 +40,8 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { bugs, website, server } from "variables/general.js";
 import UpdateEnergia from "components/updateEnergia";
+import UpdateTemperatura from "components/updateTemperatura";
+import UpdateAgua from "components/updateAgua";
 
 import {
   dailySalesChart,
@@ -49,13 +50,207 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+var Chartist = require("chartist");
+var delays = 80,
+durations = 500;
+var delays2 = 80,
+durations2 = 500;
 
 const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
+  const[tipoEnergia, setTipoEnergia] = useState('diario');
+  const[tipoAgua, setTipoAgua] = useState('diario');
+  const[tipoTemperatura, setTipoTemperatura] = useState('diario');
+  const[graphEnergiaD, setGraphEnergiaD] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0],
+    series: [[688,688,688,688,688,3103,516,458,229,252,252,240,504,401,367,286,263,408,3500,0,0,0,0,0]]
+  });
+  const[graphEnergiaS, setGraphEnergiaS] = useState({
+    labels: [ "S","T", "Q", "Q", "S", "S", "D"],
+    series: [[15,0,0,0,0,0,0]]
+  });
+  const[graphEnergiaM, setGraphEnergiaM] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    series: [[21,20,20,21,17,22,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+  });
+  const[graphTemperaturaD, setGraphTemperaturaD] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0],
+    series: [[21,21,21,20,21,24,26,27,27,27,28,28,27,26,27,26,24,25,24,0,0,0,0,0]]
+  });
+  const[graphTemperaturaS, setGraphTemperaturaS] = useState({
+    labels: [ "S","T", "Q", "Q", "S", "S", "D"],
+    series: [[25,0,0,0,0,0,0]]
+  });
+  const[graphTemperaturaM, setGraphTemperaturaM] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    series: [[26,26,25,26,25,25,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+  });
+  const[graphAguaD, setGraphAguaD] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0],
+    series: [[0,6,0,0,0,0,182,0,0,0,0,5,4,0,0,0,0,5,212,0,0,0,0,0]]
+  });
+  const[graphAguaS, setGraphAguaS] = useState({
+    labels: [ "S","T", "Q", "Q", "S", "S", "D"],
+    series: [[420,0,0,0,0,0,0]]
+  });
+  const[graphAguaM, setGraphAguaM] = useState({
+    labels: [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],
+    series: [[411,390,379,410,265,490,420,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+  });
+  const[configGraphs, setConfigGraphs] = useState({
+    // for animation
+    animation: {
+      draw: function(data) {
+        if (data.type === "line" || data.type === "area") {
+          data.element.animate({
+            d: {
+              begin: 600,
+              dur: 700,
+              from: data.path
+                .clone()
+                .scale(1, 0)
+                .translate(0, data.chartRect.height())
+                .stringify(),
+              to: data.path.clone().stringify(),
+              easing: Chartist.Svg.Easing.easeOutQuint
+            }
+          });
+        } else if (data.type === "point") {
+          data.element.animate({
+            opacity: {
+              begin: (data.index + 1) * delays,
+              dur: durations,
+              from: 0,
+              to: 1,
+              easing: "ease"
+            }
+          });
+        }
+      }
+    }
+  });
 
-  const[graficoEnergia, setGraficoEnergia] = useState(dailySalesChart.data)
+  const chooseTemperatura = (tipo) => {
+    var labels = [];
+    var series = [];
+    if(tipo === 'diario'){
+      labels= [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0];
+      series= [[21,21,21,20,21,24,26,27,27,27,28,28,27,26,27,26,24,25,24]];
+    }
+    else if(tipo === 'semanal'){
+      labels= [ "S","T", "Q", "Q", "S", "S", "D"];
+      series= [[25]];
+    }
+    else{
+      labels= [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+      series= [[26,26,25,26,25,25,25]];
+    }
+    return({
+      options: {
+        lineSmooth: Chartist.Interpolation.cardinal({
+          tension: 0
+        }),
+        low: 0,
+        high: Math.max(series)*1.2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+        chartPadding: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0
+        }
+      },
+      data: {
+        labels:labels,
+        series:series
+      }
+    })
+  }
+
+  const chooseEnergia = (tipo) => {
+    var labels = [];
+    var series = [];
+    if(tipo === 'diario'){
+      labels = [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0];
+      series = [[688,688,688,688,688,3103,516,458,229,252,252,240,504,401,367,286,263,408,3500]];
+    }
+    else if(tipo === 'semanal'){
+      labels = [ "S","T", "Q", "Q", "S", "S", "D"];
+      series = [[15]];
+    }
+    else{
+      labels = [1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+      series = [[21,20,20,21,17,22,15]];
+    }
+    return({
+      options: {
+        lineSmooth: Chartist.Interpolation.cardinal({
+          tension: 0
+        }),
+        low: 0,
+        high: Math.max(series)*1.2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+        chartPadding: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0
+        }
+      },
+      data: {
+        labels:labels,
+        series:series
+      }
+    })
+  }
+
+  const chooseAgua = (tipo) => {
+    var labels = [];
+    var series = [];
+    if(tipo === 'diario'){
+      labels=[1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0];
+      series=[[0,6,0,0,0,0,182,0,0,0,0,5,4,0,0,0,0,5,212]];
+    }
+    else if(tipo === 'semanal'){
+      labels=[ "S","T", "Q", "Q", "S", "S", "D"];
+      series=[[420]];
+    }
+    else{
+      labels=[1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+      series= [[411,390,379,410,265,490,420]];
+    }
+    return({
+      options: {
+        lineSmooth: Chartist.Interpolation.cardinal({
+          tension: 0
+        }),
+        low: 0,
+        high: Math.max(series)*1.2, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+        chartPadding: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0
+        }
+      },
+      data: {
+        labels:labels,
+        series:series
+      }
+    })
+  }
+
+  const handleTipoEnergia = (newTipoEnergia) => {
+    setTipoEnergia(newTipoEnergia);
+  }
+
+  const handleTipoTemperatura = (newTipoTemperatura) => {
+    setTipoTemperatura(newTipoTemperatura);
+  }
+
+  const handleTipoAgua = (newTipoAgua) => {
+    setTipoAgua(newTipoAgua);
+  }
 
   return (
     <div>
@@ -84,7 +279,9 @@ export default function Dashboard() {
                 <Bathtub />
               </CardIcon>
               <p className={classes.cardCategory}>Água</p>
-              <h3 className={classes.cardTitle}>45 L</h3>
+              <h3 className={classes.cardTitle}>
+                <UpdateAgua/>
+              </h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -100,7 +297,7 @@ export default function Dashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Temperatura</p>
               <h3 className={classes.cardTitle}>
-                <UpdateEnergia/>
+                <UpdateTemperatura/>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -116,20 +313,20 @@ export default function Dashboard() {
         <GridItem xs={12} sm={12} md={4} align='center'>
           <Card chart>
             <CardHeader color="success">
-              <p style={{ 'font-size': 20}}>Consumo de Energia</p>
+              <p style={{ 'fontSize': 20}}>Consumo de Energia</p>
               <ChartistGraph
                 className="ct-chart"
-                data={dailySalesChart.data}
+                data={chooseEnergia(tipoEnergia).data}
                 type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
+                options={chooseEnergia(tipoEnergia).data}
+                listener={configGraphs.animation}
               />
             </CardHeader>
             <CardBody>
 
               <GridContainer>
                 <GridItem align="right"xs={12}>
-                  <ToggleButtonGroup>
+                  <ToggleButtonGroup value ={tipoEnergia} onChange={e => handleTipoEnergia(e.target.value)}>
                     <ToggleButton value='diario'>
                       Diario
                     </ToggleButton>
@@ -150,19 +347,19 @@ export default function Dashboard() {
         <GridItem xs={12} sm={12} md={4} align='center'>
           <Card chart>
             <CardHeader color="info">
-              <p style={{ 'font-size': 20}}>Consumo de Agua</p>
+              <p style={{ 'fontSize': 20}}>Consumo de Agua</p>
               <ChartistGraph
                 className="ct-chart"
-                data={dailySalesChart.data}
+                data={chooseAgua(tipoAgua).data}
                 type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
+                options={chooseAgua(tipoAgua).options}
+                listener={configGraphs.animation}
               />
             </CardHeader>
             <CardBody>
             <GridContainer>
                 <GridItem align="right"xs={12}>
-                  <ToggleButtonGroup>
+                  <ToggleButtonGroup value ={tipoAgua} onChange={e => handleTipoAgua(e.target.value)}>
                     <ToggleButton value='diario'>
                       Diario
                     </ToggleButton>
@@ -182,19 +379,19 @@ export default function Dashboard() {
         <GridItem xs={12} sm={12} md={4} align='center'>
           <Card chart>
             <CardHeader color="danger">
-              <p style={{ 'font-size': 20}}>Temperatura</p>
+              <p style={{ 'fontSize': 20}}>Temperatura</p>
               <ChartistGraph
                 className="ct-chart"
-                data={dailySalesChart.data}
+                data={chooseTemperatura(tipoTemperatura).data}
                 type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
+                options={chooseTemperatura(tipoTemperatura).options}
+                listener={configGraphs.animation}
               />
             </CardHeader>
             <CardBody>
               <GridContainer>
                 <GridItem align="right"xs={12}>
-                  <ToggleButtonGroup>
+                  <ToggleButtonGroup value ={tipoTemperatura} onChange={e => handleTipoTemperatura(e.target.value)}>
                     <ToggleButton value='diario'>
                       Diario
                     </ToggleButton>
