@@ -29,7 +29,7 @@
 ![Deleteadd](src/assets/github/deleteadd.gif)
 
 * Database entries:
-![DB](src/assets/github/deleteadd.gif)
+![DB](src/assets/github/database.jpg)
 
 ## Todo
 * Upgrade historic views to be more responsive and cleaner.
